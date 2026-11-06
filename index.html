@@ -52,6 +52,8 @@ main{padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
 .stage svg{width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
 .zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}
 .zoom button{width:42px;height:42px;border-radius:8px;border:1px solid var(--ln);background:#fff;font-size:20px}
+.zoom button.gira{width:auto;min-width:42px;height:auto;min-height:42px;padding:4px 6px;background:var(--verde);color:#fff;border-color:var(--verde);font-size:12px;line-height:1.1;font-weight:600}
+.zoom button.gira span{display:block;font-size:20px}
 input[type=search]{flex:1;min-width:140px;padding:9px 10px;border:1px solid var(--ln);border-radius:8px;background:#fff}
 table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--ln);border-radius:8px;overflow:hidden;font-size:14px}
 th,td{padding:8px;border-bottom:1px solid var(--ln);text-align:left}
@@ -263,14 +265,14 @@ function render(){
   const m = $("#main");
   if (aba === "planta" || aba === "3d") {
     m.innerHTML = `${legenda()}<div class="bar"><input type="search" id="q" placeholder="Buscar nº, ambiente ou face" value="${esc(filtro.q)}">
-      ${aba === "3d" ? `<button class="btn" id="r1" type="button" aria-label="Girar">⟲ Girar</button>` : ""}<button class="btn" id="enq" type="button">Enquadrar</button></div>
+<button class="btn" id="enq" type="button">Enquadrar</button></div>
       <div class="stage" id="stage"><svg id="sv" role="img" aria-label="${aba === "3d" ? "Vista 3D dos painéis" : "Planta dos painéis"}"></svg>
-      <div class="zoom"><button type="button" id="zi" aria-label="Aproximar">+</button><button type="button" id="zo" aria-label="Afastar">−</button></div></div>
-      <p class="muted">Toque num painel para ver a ficha e marcar o status. Arraste para mover, use dois dedos (ou + e −) para zoom.</p>`;
+      <div class="zoom">${aba === "3d" ? `<button type="button" class="gira" id="r1" aria-label="Girar para a esquerda"><span>⟲</span>Girar</button><button type="button" class="gira" id="r2" aria-label="Girar para a direita"><span>⟳</span>Girar</button>` : ""}<button type="button" id="zi" aria-label="Aproximar">+</button><button type="button" id="zo" aria-label="Afastar">−</button></div></div>
+      <p class="muted">Toque num painel para ver a ficha e marcar o status. Arraste para mover, use dois dedos (ou + e −) para zoom.${aba === "3d" ? " Para ver por outro lado, use os botões verdes <b>⟲ ⟳ Girar</b> (canto direito do desenho)." : ""}</p>`;
     vb = null; desenhaVista(); ligaVista();
     $("#q").oninput = e => { filtro.q = e.target.value; desenhaVista() };
     $("#enq").onclick = () => { vb = null; desenhaVista() };
-    if ($("#r1")) $("#r1").onclick = () => { rot = (rot + 1) % 4; vb = null; desenhaVista() };
+    if ($("#r1")) { $("#r1").onclick = () => { rot = (rot + 1) % 4; vb = null; desenhaVista() }; $("#r2").onclick = () => { rot = (rot + 3) % 4; vb = null; desenhaVista() } }
     $("#zi").onclick = () => zoom(0.7); $("#zo").onclick = () => zoom(1 / 0.7);
   } else if (aba === "lista") lista();
   else if (aba === "tabela") tabela();
@@ -553,7 +555,7 @@ document.addEventListener("visibilitychange", () => { if (document.hidden) salva
 const TUT = [
   ["👷", "Para que serve", "Esta página mostra <b>cada painel de fôrma</b> do jogo do Residencial Madrid: onde ele vai, a medida e o status na obra. Funciona <b>sem internet</b>, no celular e no tablet."],
   ["🔁", "1. Escolha o ciclo", "Cada concretagem (ex.: <b>2º pav. – apto 201</b>) é um <b>ciclo</b>. Escolha no topo ou toque em <b>+ Ciclo</b> para começar um novo: todos os painéis voltam para <b>Pendente</b>."],
-  ["🗺️", "2. Ache o painel", "Na <b>Planta</b> ou no <b>3D</b>, arraste para mover e use dois dedos (ou + e −) para zoom. Use a busca pelo <b>número pintado</b>. Na <b>Lista</b> dá para filtrar por ambiente e status."],
+  ["🗺️", "2. Ache o painel", "Na <b>Planta</b> ou no <b>3D</b>, arraste para mover e use dois dedos (ou + e −) para zoom. No 3D, os botões verdes <b>⟲ ⟳ Girar</b> mostram o outro lado. Use a busca pelo <b>número pintado</b>. Na <b>Lista</b> dá para filtrar por ambiente e status."],
   ["✅", "3. Marque o status", "Toque no painel: abre a <b>ficha</b> com a medida e a elevação da parede. Toque em <b>Instalado</b>, <b>Concretado</b> ou <b>Retirado</b>. Errou? <b>Desfazer</b>. Para a parede toda, use <b>Marcar a face inteira</b>."],
   ["💾", "4. Salvo e compartilhado", "Tudo é <b>salvo sozinho</b> neste aparelho. Em <b>☰ Dados</b>: coloque seu nome e faça o <b>Download</b> do arquivo (cópia); no outro aparelho, faça o <b>Upload</b> dele para juntar. O <b>Resumo</b> mostra o andamento."]];
 let tutI = 0;
