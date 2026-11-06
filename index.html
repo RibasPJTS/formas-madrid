@@ -25,7 +25,7 @@ header h1 small{font-weight:300;opacity:.85;font-size:13px}
 .hb{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:6px;padding:6px 10px;cursor:pointer}
 #aviso{display:none;background:#b3261e;color:#fff;padding:8px 12px;font-size:13px}
 nav{display:flex;gap:4px;background:var(--pn);border-bottom:1px solid var(--ln);padding:6px 8px;overflow-x:auto;position:sticky;top:var(--hh,52px);z-index:15}
-nav button{border:0;background:none;padding:8px 12px;border-radius:6px;white-space:nowrap;cursor:pointer}
+nav button{flex:1 0 auto;border:0;background:none;padding:8px 10px;border-radius:6px;white-space:nowrap;cursor:pointer}
 nav button.on{background:var(--verde3);box-shadow:inset 0 -3px 0 var(--verde);font-weight:600}
 main{padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
 .leg{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;margin:4px 0 8px}
@@ -66,6 +66,9 @@ tr.tot td{background:var(--verde);color:#fff;font-weight:600}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tw table{min-width:0}
 a.btn{color:inherit} a.btn.pri{color:#fff}
+dialog label.btn{display:inline-flex;font-size:inherit;color:var(--tx,inherit);margin:0}
+@media (max-width:360px){nav{gap:0;padding:6px 4px} nav button{padding:8px 6px;font-size:14px}}
+.rz{overflow-x:auto;-webkit-overflow-scrolling:touch} .rz th,.rz td{padding-left:6px;padding-right:6px}
 td.num{font-variant-numeric:tabular-nums}
 .nw{white-space:nowrap}
 .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;color:#fff}
@@ -154,14 +157,14 @@ dialog input,dialog select{width:100%;padding:9px;border:1px solid var(--ln);bor
 
 <dialog id="dlgMenu">
   <h3 style="margin:0 0 6px">Dados e cópias</h3>
-  <p class="muted" style="margin:0 0 8px">Tudo fica salvo neste aparelho automaticamente, sem internet. Para juntar com outro celular ou guardar uma cópia, use os botões abaixo.</p>
+  <p class="muted" style="margin:0 0 8px">Tudo fica salvo neste aparelho automaticamente, sem internet. Para guardar uma cópia, faça o <b>download</b>; para juntar com outro aparelho, faça o <b>upload</b> do arquivo dele (nada é apagado).</p>
   <label for="mNome">Seu nome / aparelho (vai junto em cada marcação)</label>
   <input id="mNome" maxlength="40" placeholder="ex.: João – tablet 1">
   <div class="bar" style="margin-top:12px">
-    <button class="btn pri" id="bExp" type="button">⬇ Exportar status (.json)</button>
-    <label class="btn" for="fImp" style="display:inline-flex;align-items:center">⬆ Juntar arquivo…</label>
-    <input type="file" id="fImp" accept=".json,application/json" hidden>
-    <button class="btn" id="bCsv" type="button">⬇ Planilha do ciclo (.csv)</button>
+    <button class="btn pri" id="bExp" type="button">⬇ Download dos status (.json)</button>
+    <label class="btn" for="fImp" style="display:inline-flex;align-items:center">⬆ Upload de arquivo (.json)</label>
+    <input type="file" id="fImp" hidden>
+    <button class="btn" id="bCsv" type="button">⬇ Download planilha do ciclo (.csv)</button>
   </div>
   <div class="bar">
     <button class="btn" id="bRen" type="button">Renomear ciclo</button>
@@ -219,7 +222,7 @@ function salva(){
 }
 function mostraAviso(){
   const a = $("#aviso"); a.style.display = "block";
-  a.textContent = "Atenção: este navegador não está salvando os dados (modo anônimo ou armazenamento bloqueado). Use ☰ Dados → Exportar antes de fechar, ou abra o arquivo em outro navegador (Chrome).";
+  a.textContent = "Atenção: este navegador não está salvando os dados (modo anônimo ou armazenamento bloqueado). Use ☰ Dados → Download antes de fechar, ou abra o arquivo em outro navegador (Chrome).";
 }
 S = carrega();
 
@@ -455,10 +458,10 @@ function lista(){
     <select id="fa" class="btn"><option value="">Todos os ambientes</option>${ambs.map(a => `<option ${a === filtro.amb ? "selected" : ""}>${esc(a)}</option>`).join("")}</select>
     <select id="fs" class="btn"><option value="">Todos os status</option>${Object.entries(ST).map(([k, s]) => `<option value="${k}" ${k === filtro.st ? "selected" : ""}>${s.n}</option>`).join("")}</select></div>
     <p class="muted">${rows.length} de ${P.length} painéis · ciclo ${esc(S.ciclos[S.atual].nome)}</p>
-    <table><thead><tr><th>Nº</th><th>Ambiente / face</th><th class="r">Medida (mm)</th><th>Status</th></tr></thead><tbody>
+    <div class="rz"><table><thead><tr><th>Nº</th><th>Ambiente / face</th><th class="r">Medida (mm)</th><th>Status</th></tr></thead><tbody>
     ${rows.map(p => { const st = status(p.id); return `<tr class="click" data-id="${esc(p.id)}"><td><span class="sw" style="background:${rgb(p.cor)}"></span><b>${esc(p.numero || "–")}</b></td>
-      <td>${esc(p.ambiente)}<br><span class="muted">${esc(p.face)} · ${esc(p.tipo)}</span></td><td class="r">${fmt(p.largura)} × ${fmt(p.altura)}</td>
-      <td><span class="pill" style="background:${ST[st].c};color:${ST[st].tx}">${ST[st].n}</span></td></tr>` }).join("")}</tbody></table>`;
+      <td>${esc(p.ambiente)}<br><span class="muted">${esc(p.face)} · ${esc(p.tipo)}</span></td><td class="r"><span class="nw">${fmt(p.largura)} ×</span> ${fmt(p.altura)}</td>
+      <td><span class="pill" style="background:${ST[st].c};color:${ST[st].tx}">${ST[st].n}</span></td></tr>` }).join("")}</tbody></table></div>`;
   $("#q").oninput = e => { filtro.q = e.target.value; const pos = e.target.selectionStart; lista(); const q = $("#q"); q.focus(); try { q.setSelectionRange(pos, pos) } catch(_) {} };
   $("#fa").onchange = e => { filtro.amb = e.target.value; lista() };
   $("#fs").onchange = e => { filtro.st = e.target.value; lista() };
@@ -467,17 +470,17 @@ function lista(){
 function resumo(){
   const ambs = [...new Set(P.map(p => p.ambiente))], cont = k => P.filter(p => status(p.id) === k);
   const tot = Object.fromEntries(Object.keys(ST).map(k => [k, cont(k)]));
-  const m2 = a => a.reduce((t, p) => t + p.m2, 0);
+  const m2 = a => a.reduce((t, p) => t + p.largura * p.altura / 1e6, 0);
   $("#main").innerHTML = `<h2>Ciclo: ${esc(S.ciclos[S.atual].nome)}</h2>
     <div class="cards">${Object.entries(ST).map(([k, s]) => `<div class="card" style="border-left:6px solid ${s.c}"><small>${s.n}</small><b>${tot[k].length}</b><small>${fmt(m2(tot[k]), 1)} m²</small></div>`).join("")}</div>
     <h2>Por ambiente</h2>
-    <table><thead><tr><th>Ambiente</th>${Object.values(ST).map(s => `<th class="r">${s.n}</th>`).join("")}<th class="r">Total</th></tr></thead><tbody>
+    <div class="rz"><table><thead><tr><th>Ambiente</th>${Object.values(ST).map(s => `<th class="r" title="${s.n}">${s.n.slice(0, 4)}.</th>`).join("")}<th class="r">Total</th></tr></thead><tbody>
     ${ambs.map(a => { const ps = P.filter(p => p.ambiente === a); return `<tr><td>${esc(a)}</td>${Object.keys(ST).map(k => `<td class="r">${ps.filter(p => status(p.id) === k).length}</td>`).join("")}<td class="r"><b>${ps.length}</b></td></tr>` }).join("")}
-    </tbody></table>
+    </tbody></table></div>
     <h2>Todos os ciclos</h2>
-    <table><thead><tr><th>Ciclo</th><th class="r">Instalados</th><th class="r">Concretados</th><th class="r">Retirados</th></tr></thead><tbody>
+    <div class="rz"><table><thead><tr><th>Ciclo</th><th class="r">Inst.</th><th class="r">Conc.</th><th class="r">Ret.</th></tr></thead><tbody>
     ${Object.entries(S.ciclos).map(([id, c]) => `<tr><td>${esc(c.nome)}${id === S.atual ? " (atual)" : ""}<br><span class="muted">criado ${dataBR(c.criado)}</span></td>${ORDEM_ST.map(k => `<td class="r">${P.filter(p => status(p.id, id) === k).length}</td>`).join("")}</tr>`).join("")}
-    </tbody></table>
+    </tbody></table></div>
     <p class="muted">Dados: ${esc(DATA.obra)} · ${P.length} painéis · ${fmt(m2(P), 2)} m² · ${esc(DATA.fonte)} · versão dos dados ${esc(DATA.versao)}</p>`;
 }
 
@@ -497,36 +500,31 @@ $("#bDel").onclick = () => {
   if (Object.keys(S.ciclos).length < 2) { toast("Precisa haver pelo menos um ciclo."); return }
   const c = S.ciclos[S.atual], n = Object.values(S.reg[S.atual] || {}).reduce((t, a) => t + a.length, 0);
   if (!confirm(`Excluir o ciclo "${c.nome}" e as ${n} marcações dele? Isso não tem volta (exporte antes, se quiser guardar).`)) return;
-  delete S.ciclos[S.atual]; delete S.reg[S.atual]; S.atual = Object.keys(S.ciclos)[0]; salva(); $("#dlgMenu").close(); redesenha();
+  delete S.ciclos[S.atual]; delete S.reg[S.atual]; S.atual = Object.entries(S.ciclos).sort((a, b) => a[1].criado < b[1].criado ? 1 : -1)[0][0]; salva(); $("#dlgMenu").close(); redesenha();
 };
 $("#bMenu").onclick = () => { $("#mNome").value = S.aparelho || ""; const n = Object.values(S.reg).reduce((t, m) => t + Object.values(m).reduce((u, a) => u + a.length, 0), 0);
   $("#mInfo").textContent = `${Object.keys(S.ciclos).length} ciclo(s), ${n} marcação(ões) salvas neste aparelho${podeSalvar ? "" : " (ATENÇÃO: não está salvando!)"}.`; $("#dlgMenu").showModal() };
 $("#bFechar").onclick = () => $("#dlgMenu").close();
-$("#mNome").onchange = e => { S.aparelho = e.target.value.trim().slice(0, 40); salva() };
-async function baixa(nome, txt, tipo){
-  // celular: abre o "Compartilhar" do aparelho (WhatsApp, Salvar em Arquivos...); no iPhone, pelo ícone da Tela de Início, é o único jeito
-  try {
-    const f = new File([txt], nome, {type:tipo});
-    if (navigator.canShare && navigator.canShare({files:[f]}) && /Android|iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && "ontouchend" in document) {
-      await navigator.share({files:[f], title:nome}); return;
-    }
-  } catch (e) { if (e && e.name === "AbortError") return }
-  const b = new Blob([txt], {type:tipo}), a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = nome;
-  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 1500);
+$("#mNome").oninput = e => { S.aparelho = e.target.value.trim().slice(0, 40); salva() };
+function baixa(nome, txt){
+  // download direto (computador, Android e iPhone): octet-stream para o navegador salvar o arquivo em vez de abrir na tela
+  const b = new Blob([txt], {type:"application/octet-stream"}), a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = nome;
+  a.rel = "noopener"; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 60000);
 }
-const carimbo = () => new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "").replace(/^(\d{8})(\d{4})$/, "$1-$2");
+const carimbo = () => { const d = new Date(), z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}` };
 const limpaNome = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 30);
-$("#bExp").onclick = () => { baixa(`status_formas_madrid_${carimbo()}${S.aparelho ? "_" + limpaNome(S.aparelho) : ""}.json`, JSON.stringify(S, null, 1), "application/json"); toast("Arquivo gerado. Mande pelo WhatsApp ou guarde na pasta da obra.") };
+$("#bExp").onclick = () => { baixa(`status_formas_madrid_${carimbo()}${S.aparelho ? "_" + limpaNome(S.aparelho) : ""}.json`, JSON.stringify(S, null, 1)); toast("Download feito (pasta Downloads / Arquivos). Para juntar, faça o upload dele no outro aparelho.") };
 $("#bCsv").onclick = () => {
   const linhas = [["Ciclo","Ambiente","Face","Numero","Tipo","Largura_mm","Altura_mm","Area_m2","Status","Data","Por"].join(";")];
   for (const p of P) { const e = evs(p.id), u = e[e.length - 1];
     linhas.push([S.ciclos[S.atual].nome, p.ambiente, p.face, p.numero, p.tipo, p.largura, p.altura, String(p.m2).replace(".", ","), ST[status(p.id)].n, u ? dataBR(u.t) : "", u ? u.por : ""]
-      .map(v => { v = String(v ?? ""); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v }).join(";")) }
-  baixa(`status_${limpaNome(S.ciclos[S.atual].nome)}_${carimbo()}.csv`, "﻿" + linhas.join("\r\n"), "text/csv;charset=utf-8");
+      .map(v => { v = String(v ?? ""); if (/^[=+\-@]/.test(v)) v = "'" + v; return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v }).join(";")) }
+  baixa(`status_${limpaNome(S.ciclos[S.atual].nome)}_${carimbo()}.csv`, "﻿" + linhas.join("\r\n")); toast("Download da planilha feito (abre no Excel).");
 };
 $("#fImp").onchange = async e => {
   const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return;
-  let o; try { o = JSON.parse(await f.text()) } catch(_) { toast("Arquivo inválido: não é um .json desta página."); return }
+  if (f.size > 20e6) { toast("Arquivo grande demais: não é um arquivo de status desta página."); return }
+  let o; try { o = JSON.parse((await f.text()).replace(/^\uFEFF/, "")) } catch(_) { toast("Arquivo inválido: escolha o .json baixado em ☰ Dados (não o .csv)."); return }
   if (!valida(o)) { toast("Arquivo inválido: não é um arquivo de status das Fôrmas Madrid."); return }
   let novos = 0, ciclosNovos = 0, desconhecidos = 0;
   for (const [id, c] of Object.entries(o.ciclos)) {
@@ -541,10 +539,14 @@ $("#fImp").onchange = async e => {
     }
   }
   salva(); $("#dlgMenu").close(); redesenha();
-  toast(`Juntado: ${novos} marcação(ões) nova(s), ${ciclosNovos} ciclo(s) novo(s)${desconhecidos ? `, ${desconhecidos} painel(éis) de outra versão ignorado(s)` : ""}.`);
+  toast(`Upload feito: ${novos} marcação(ões) nova(s), ${ciclosNovos} ciclo(s) novo(s)${desconhecidos ? `, ${desconhecidos} painel(éis) de outra versão ignorado(s)` : ""}.`);
 };
 document.addEventListener("keydown", e => { if (e.key === "Escape" && sel) fecha() });
 window.addEventListener("pagehide", salva);
+window.addEventListener("storage", e => {   // outra aba/janela salvou: recarrega para não sobrescrever as marcações dela
+  if (e.key !== KEY || !e.newValue) return;
+  try { const n = JSON.parse(e.newValue); if (valida(n)) { S = n; if (sel && !PID[sel]) sel = null; redesenha() } } catch(_) {}
+});
 document.addEventListener("visibilitychange", () => { if (document.hidden) salva() });
 
 /* ---------- tutorial rápido (abre na 1ª vez; "? Tutorial" no topo para rever) ---------- */
@@ -553,7 +555,7 @@ const TUT = [
   ["🔁", "1. Escolha o ciclo", "Cada concretagem (ex.: <b>2º pav. – apto 201</b>) é um <b>ciclo</b>. Escolha no topo ou toque em <b>+ Ciclo</b> para começar um novo: todos os painéis voltam para <b>Pendente</b>."],
   ["🗺️", "2. Ache o painel", "Na <b>Planta</b> ou no <b>3D</b>, arraste para mover e use dois dedos (ou + e −) para zoom. Use a busca pelo <b>número pintado</b>. Na <b>Lista</b> dá para filtrar por ambiente e status."],
   ["✅", "3. Marque o status", "Toque no painel: abre a <b>ficha</b> com a medida e a elevação da parede. Toque em <b>Instalado</b>, <b>Concretado</b> ou <b>Retirado</b>. Errou? <b>Desfazer</b>. Para a parede toda, use <b>Marcar a face inteira</b>."],
-  ["💾", "4. Salvo e compartilhado", "Tudo é <b>salvo sozinho</b> neste aparelho. Em <b>☰ Dados</b>: coloque seu nome, <b>Exporte</b> o arquivo e mande pelo WhatsApp; no outro aparelho, <b>Juntar arquivo</b>. O <b>Resumo</b> mostra o andamento."]];
+  ["💾", "4. Salvo e compartilhado", "Tudo é <b>salvo sozinho</b> neste aparelho. Em <b>☰ Dados</b>: coloque seu nome e faça o <b>Download</b> do arquivo (cópia); no outro aparelho, faça o <b>Upload</b> dele para juntar. O <b>Resumo</b> mostra o andamento."]];
 let tutI = 0;
 function tutMostra(){
   const [ic, t, x] = TUT[tutI];

@@ -1,5 +1,5 @@
 // Fôrmas Madrid – canteiro: guarda a página no aparelho para funcionar sem internet.
-const CACHE = "formas-madrid-6fed00f790";
+const CACHE = "formas-madrid-f97ff56423";
 const ARQUIVOS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./quantitativo.xlsx", "./quantitativo.pdf"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARQUIVOS)).then(() => self.skipWaiting())) });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith("formas-madrid-") && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())) });
