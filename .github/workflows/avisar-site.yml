@@ -1,0 +1,30 @@
+# Quando o Fôrmas Madrid muda, avisa o site principal (RibasPJTS/SitePJTS)
+# para ele republicar a Área restrita com esta versão nova.
+#
+# Para ligar: crie um token (GitHub → Settings → Developer settings →
+# Fine-grained tokens) com acesso só ao repositório SitePJTS, permissão
+# "Contents: Read and write", e salve aqui em
+# Settings → Secrets and variables → Actions → SITE_PJTS_TOKEN.
+# Sem o token, este aviso só é pulado (o GitHub Pages continua normal).
+name: Avisar site Projetse
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar publicação no SitePJTS
+        env:
+          TOKEN: ${{ secrets.SITE_PJTS_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "SITE_PJTS_TOKEN não configurado: aviso pulado."; exit 0; fi
+          curl -fsS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $TOKEN" \
+            https://api.github.com/repos/RibasPJTS/SitePJTS/dispatches \
+            -d '{"event_type":"formas-atualizado","client_payload":{"commit":"${{ github.sha }}"}}'
+          echo "Site avisado."
