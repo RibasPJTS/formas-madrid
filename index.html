@@ -168,6 +168,7 @@ dialog input,dialog select{width:100%;padding:9px;border:1px solid var(--ln);bor
     <input type="file" id="fImp" hidden>
     <button class="btn" id="bCsv" type="button">⬇ Download planilha do ciclo (.csv)</button>
   </div>
+  <div class="bar" id="mProj" hidden><a class="btn" href="projeto.pdf" download="MADR-FOR-TO02-R00 - Projeto FOR-01 a FOR-05.pdf" style="text-decoration:none">⬇ Projeto atual (PDF das pranchas FOR-01 a FOR-05)</a></div>
   <div class="bar">
     <button class="btn" id="bRen" type="button">Renomear ciclo</button>
     <button class="btn" id="bDel" type="button">Excluir ciclo…</button>
@@ -417,7 +418,8 @@ function tabela(){
   const online = /^https?:$/.test(location.protocol);
   let h = `<div class="bar"><div class="seg" role="tablist">${[["lista", "Lista por ambiente"], ["medidas", "Por medida"], ["ambientes", "Por ambiente"]].map(([k, n]) => `<button type="button" data-tv="${k}" class="${tabVis === k ? "on" : ""}">${n}</button>`).join("")}</div></div>`;
   if (online) h += `<div class="bar"><a class="btn pri" href="quantitativo.xlsx" download="MADR-FOR-QT-TO02-R00 - Quantitativo de paineis.xlsx" style="text-decoration:none">⬇ Planilha Excel</a>
-      <a class="btn" href="quantitativo.pdf" download="MADR-FOR-QT-TO02-R00 - Quantitativo de paineis.pdf" style="text-decoration:none">⬇ PDF para imprimir</a></div>`;
+      <a class="btn" href="quantitativo.pdf" download="MADR-FOR-QT-TO02-R00 - Quantitativo de paineis.pdf" style="text-decoration:none">⬇ PDF para imprimir</a>
+      <a class="btn" href="projeto.pdf" download="MADR-FOR-TO02-R00 - Projeto FOR-01 a FOR-05.pdf" style="text-decoration:none">⬇ Projeto (PDF das pranchas)</a></div>`;
   if (tabVis === "lista") {
     const rs = T.lista.filter(casaT);
     h += `<div class="bar"><input type="search" id="q" placeholder="Buscar nº, ambiente, parede ou prancha" value="${esc(filtro.q)}"></div>
@@ -507,7 +509,7 @@ $("#bDel").onclick = () => {
   if (!confirm(`Excluir o ciclo "${c.nome}" e as ${n} marcações dele? Isso não tem volta (exporte antes, se quiser guardar).`)) return;
   delete S.ciclos[S.atual]; delete S.reg[S.atual]; S.atual = Object.entries(S.ciclos).sort((a, b) => a[1].criado < b[1].criado ? 1 : -1)[0][0]; salva(); $("#dlgMenu").close(); redesenha();
 };
-$("#bMenu").onclick = () => { $("#mNome").value = S.aparelho || ""; const n = Object.values(S.reg).reduce((t, m) => t + Object.values(m).reduce((u, a) => u + a.length, 0), 0);
+$("#bMenu").onclick = () => { $("#mProj").hidden = !/^https?:$/.test(location.protocol); $("#mNome").value = S.aparelho || ""; const n = Object.values(S.reg).reduce((t, m) => t + Object.values(m).reduce((u, a) => u + a.length, 0), 0);
   $("#mInfo").textContent = `${Object.keys(S.ciclos).length} ciclo(s), ${n} marcação(ões) salvas neste aparelho${podeSalvar ? "" : " (ATENÇÃO: não está salvando!)"}.`; $("#dlgMenu").showModal() };
 $("#bFechar").onclick = () => $("#dlgMenu").close();
 $("#mNome").oninput = e => { S.aparelho = e.target.value.trim().slice(0, 40); salva() };
